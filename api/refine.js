@@ -2,9 +2,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { buildRefinePrompt } from './_lib/prompts.js';
 
 const MODELS = [
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
     'gemini-1.5-flash',
-    'gemini-1.5-pro',
-    'gemini-pro'
+    'gemini-1.5-pro'
 ];
 
 export default async function handler(req, res) {
@@ -12,6 +13,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -24,8 +26,14 @@ export default async function handler(req, res) {
     try {
         const data = req.body;
 
-        if (!data.current_english || !data.current_hebrew || !data.instruction) {
+        if (!data || !data.current_english || !data.current_hebrew || !data.instruction) {
             return res.status(400).json({ error: 'Current text and instruction are required' });
+        }
+
+        // Check for API key
+        if (!process.env.GEMINI_API_KEY) {
+            console.error('GEMINI_API_KEY environment variable is not set');
+            return res.status(500).json({ error: 'Server configuration error: API key not configured' });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -33,6 +41,7 @@ export default async function handler(req, res) {
 
         for (const modelName of MODELS) {
             try {
+                console.log(`Trying model: ${modelName}`);
                 const model = genAI.getGenerativeModel({
                     model: modelName,
                     generationConfig: {
@@ -63,6 +72,7 @@ export default async function handler(req, res) {
                     throw new Error('Invalid response: missing required text fields');
                 }
 
+                console.log(`Success with model: ${modelName}`);
                 return res.status(200).json({
                     version: (data.current_version || 1) + 1,
                     english_text: parsed.english_text,
@@ -79,9 +89,18 @@ export default async function handler(req, res) {
                 console.error(`Refine Model ${modelName} failed:`, error.message);
                 lastError = error;
 
-                if (error.message && (error.message.includes('429') || error.message.includes('QuotaFailure') || error.message.includes('Too Many Requests'))) {
+                // Continue to next model on rate limit or model not found
+                if (error.message && (
+                    error.message.includes('429') ||
+                    error.message.includes('QuotaFailure') ||
+                    error.message.includes('Too Many Requests') ||
+                    error.message.includes('not found') ||
+                    error.message.includes('does not exist')
+                )) {
                     continue;
                 }
+                // For other errors, also try next model
+                continue;
             }
         }
 

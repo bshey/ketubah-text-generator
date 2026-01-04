@@ -2,16 +2,18 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SYSTEM_PROMPT, buildGeneratePrompt } from './_lib/prompts.js';
 
 const MODELS = [
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
     'gemini-1.5-flash',
-    'gemini-1.5-pro',
-    'gemini-pro'
+    'gemini-1.5-pro'
 ];
 
 export default async function handler(req, res) {
-    // CORS headers
+    // CORS headers - set immediately
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
         const data = req.body;
 
         // Validate required fields
-        if (!data.partner1?.english_name || !data.partner2?.english_name) {
+        if (!data || !data.partner1?.english_name || !data.partner2?.english_name) {
             return res.status(400).json({ error: 'Partner names are required' });
         }
 
@@ -40,6 +42,7 @@ export default async function handler(req, res) {
 
         for (const modelName of MODELS) {
             try {
+                console.log(`Trying model: ${modelName}`);
                 const model = genAI.getGenerativeModel({
                     model: modelName,
                     generationConfig: {
@@ -83,6 +86,7 @@ export default async function handler(req, res) {
                     throw new Error('Invalid response: missing required text fields');
                 }
 
+                console.log(`Success with model: ${modelName}`);
                 return res.status(200).json({
                     session_id: crypto.randomUUID(),
                     version: 1,
@@ -100,9 +104,18 @@ export default async function handler(req, res) {
                 console.error(`Model ${modelName} failed:`, error.message);
                 lastError = error;
 
-                if (error.message && (error.message.includes('429') || error.message.includes('QuotaFailure') || error.message.includes('Too Many Requests'))) {
+                // Continue to next model on rate limit or model not found
+                if (error.message && (
+                    error.message.includes('429') ||
+                    error.message.includes('QuotaFailure') ||
+                    error.message.includes('Too Many Requests') ||
+                    error.message.includes('not found') ||
+                    error.message.includes('does not exist')
+                )) {
                     continue;
                 }
+                // For other errors, also try next model
+                continue;
             }
         }
 
