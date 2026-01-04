@@ -1,0 +1,36 @@
+:root {
+  /* Colors - will inherit from Shopify theme if embedded */
+  --ketubah-primary: var(--color-primary, #1a365d);
+  --ketubah-secondary: var(--color-secondary, #4a5568);
+  --ketubah-accent: var(--color-accent, #b8860b);
+  --ketubah-background: var(--color-background, #ffffff);
+  --ketubah-surface: var(--color-surface, #f7fafc);
+  --ketubah-border: var(--color-border, #e2e8f0);
+  --ketubah-error: #e53e3e;
+  --ketubah-success: #38a169;
+
+  /* Typography */
+  --ketubah-font-heading: var(--font-heading-family, 'Georgia', 'Times New Roman', serif);
+  --ketubah-font-body: var(--font-body-family, 'system-ui', '-apple-system', sans-serif);
+  --ketubah-font-hebrew: 'David Libre', 'Times New Roman', serif;
+
+  /* Spacing */
+  --ketubah-space-xs: 0.25rem;
+  --ketubah-space-sm: 0.5rem;
+  --ketubah-space-md: 1rem;
+  --ketubah-space-lg: 1.5rem;
+  --ketubah-space-xl: 2rem;
+
+  /* Border radius */
+  --ketubah-radius-sm: 4px;
+  --ketubah-radius-md: 8px;
+  --ketubah-radius-lg: 12px;
+
+  /* Shadows */
+  --ketubah-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ketubah-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --ketubah-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --ketubah-transition: 150ms ease-in-out;
+}
