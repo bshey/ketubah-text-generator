@@ -1,12 +1,34 @@
+import { useState } from 'react'
 import { useKetubanStore } from './store/ketubanStore'
 import { useGenerate } from './hooks/useGenerate'
 import { FormPanel } from './components/Form/FormPanel'
 import { PreviewPanel } from './components/Preview/PreviewPanel'
+import { EmailModal } from './components/Email/EmailModal'
+import { sendText } from './services/api'
 
 function App({ options = {} }) {
-    const { englishText, isGenerating, error, scribeMessage } = useKetubanStore()
+    const {
+        englishText, hebrewText, isGenerating, error,
+        showEmailModal, setShowEmailModal, setError
+    } = useKetubanStore()
     const { generate, canGenerate } = useGenerate()
     const hasGenerated = !!englishText
+    const [emailSent, setEmailSent] = useState(false)
+
+    const handleEmailSubmit = async (email) => {
+        try {
+            await sendText({
+                email,
+                english_text: englishText,
+                hebrew_text: hebrewText
+            })
+            setEmailSent(true)
+            setShowEmailModal(false)
+            // Could redirect to confirmation page here
+        } catch (err) {
+            throw err
+        }
+    }
 
     return (
         <div className="ketubah-generator">
@@ -20,8 +42,21 @@ function App({ options = {} }) {
                     {error}
                     <button
                         className="error-dismiss"
-                        onClick={() => useKetubanStore.getState().setError(null)}
+                        onClick={() => setError(null)}
                         aria-label="Dismiss error"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
+
+            {emailSent && (
+                <div className="success-banner" role="status">
+                    ✅ Your Ketubah text has been sent! Check your email.
+                    <button
+                        className="success-dismiss"
+                        onClick={() => setEmailSent(false)}
+                        aria-label="Dismiss"
                     >
                         ×
                     </button>
@@ -43,7 +78,7 @@ function App({ options = {} }) {
 
                 {hasGenerated && (
                     <div className="preview-column">
-                        <PreviewPanel />
+                        <PreviewPanel onGetText={() => setShowEmailModal(true)} />
                     </div>
                 )}
             </main>
@@ -54,6 +89,13 @@ function App({ options = {} }) {
                     <p className="loading-text">The Wise Scribe is crafting your Ketubah...</p>
                     <p className="loading-subtext">This may take 10-20 seconds</p>
                 </div>
+            )}
+
+            {showEmailModal && (
+                <EmailModal
+                    onSubmit={handleEmailSubmit}
+                    onClose={() => setShowEmailModal(false)}
+                />
             )}
         </div>
     )

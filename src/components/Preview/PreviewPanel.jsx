@@ -1,6 +1,6 @@
 import { useKetubanStore } from '../../store/ketubanStore'
 
-export function PreviewPanel() {
+export function PreviewPanel({ onGetText }) {
     const { englishText, hebrewText, scribeMessage } = useKetubanStore()
 
     if (!englishText) {
@@ -44,7 +44,7 @@ export function PreviewPanel() {
                 <p className="preview-notice">
                     ✉️ Enter your email to receive a copyable version of your Ketubah text
                 </p>
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={onGetText}>
                     Get My Ketubah Text
                 </button>
             </div>

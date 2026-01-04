@@ -1,4 +1,5 @@
 import { useKetubanStore } from '../../store/ketubanStore'
+import { useHebrewDate } from '../../hooks/useHebrewDate'
 
 export function FormPanel() {
     const {
@@ -6,6 +7,8 @@ export function FormPanel() {
         setPartner1, setPartner2, setWeddingDate, setLocation, setStyle, setStory,
         isGenerating
     } = useKetubanStore()
+
+    const { hebrew: hebrewDate, hebrewEnglish } = useHebrewDate(weddingDate)
 
     const styles = [
         { value: 'Reform', label: 'Reform', desc: 'Modern covenant language, personal connection' },
@@ -36,7 +39,7 @@ export function FormPanel() {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="p1-hebrew">Hebrew Name</label>
+                    <label htmlFor="p1-hebrew">Hebrew Name (optional)</label>
                     <input
                         id="p1-hebrew"
                         type="text"
@@ -47,6 +50,7 @@ export function FormPanel() {
                         dir="rtl"
                         disabled={isGenerating}
                     />
+                    <span className="form-hint">Format: Name ben/bat Father's Name (e.g., שרה בת דוד)</span>
                 </div>
             </fieldset>
 
@@ -66,7 +70,7 @@ export function FormPanel() {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="p2-hebrew">Hebrew Name</label>
+                    <label htmlFor="p2-hebrew">Hebrew Name (optional)</label>
                     <input
                         id="p2-hebrew"
                         type="text"
@@ -77,6 +81,7 @@ export function FormPanel() {
                         dir="rtl"
                         disabled={isGenerating}
                     />
+                    <span className="form-hint">Format: Name ben/bat Father's Name</span>
                 </div>
             </fieldset>
 
@@ -93,9 +98,16 @@ export function FormPanel() {
                         disabled={isGenerating}
                         required
                     />
+                    {hebrewDate && (
+                        <div className="hebrew-date-display">
+                            <span className="hebrew-date-label">Hebrew Date:</span>
+                            <span className="hebrew-date-value" dir="rtl">{hebrewDate}</span>
+                            <span className="hebrew-date-english">({hebrewEnglish})</span>
+                        </div>
+                    )}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="venue">Venue</label>
+                    <label htmlFor="venue">Venue (optional)</label>
                     <input
                         id="venue"
                         type="text"
@@ -162,10 +174,11 @@ export function FormPanel() {
                         id="story"
                         value={story}
                         onChange={(e) => setStory(e.target.value)}
-                        placeholder="We met at a coffee shop in Brooklyn..."
-                        rows={4}
+                        placeholder="We met at a coffee shop in Brooklyn. Sarah was reading a book about Jewish history, and Michael asked about it. Three years later, here we are..."
+                        rows={5}
                         disabled={isGenerating}
                     />
+                    <span className="form-hint">The more detail you share, the more personalized your Ketubah will be!</span>
                 </div>
             </fieldset>
         </div>
