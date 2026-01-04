@@ -2,9 +2,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SYSTEM_PROMPT, buildGeneratePrompt } from './_lib/prompts.js';
 
 // Text-out models in order of preference
+// Models with thinking_level config (Gemini 3+) are marked
 const MODELS = [
-    'gemini-2.5-flash',
-    'gemini-2.5-flash-lite'
+    { name: 'gemini-3-flash-preview', thinkingLevel: 'low' },
+    { name: 'gemini-2.5-flash', thinkingLevel: null },
+    { name: 'gemini-2.5-flash-lite', thinkingLevel: null }
 ];
 
 export default async function handler(req, res) {
@@ -40,17 +42,29 @@ export default async function handler(req, res) {
         let lastError = null;
         let quotaErrors = 0;
 
-        for (const modelName of MODELS) {
+        for (const modelConfig of MODELS) {
             try {
-                console.log(`Trying model: ${modelName}`);
+                console.log(`Trying model: ${modelConfig.name}`);
+
+                // Build generation config
+                const generationConfig = {
+                    temperature: 0.7,
+                    topP: 0.9,
+                    maxOutputTokens: 4096,
+                    responseMimeType: 'application/json',
+                };
+
+                // Add thinking level for Gemini 3+ models
+                if (modelConfig.thinkingLevel) {
+                    generationConfig.thinkingConfig = {
+                        thinkingBudget: modelConfig.thinkingLevel === 'low' ? 1024 :
+                            modelConfig.thinkingLevel === 'medium' ? 4096 : 8192
+                    };
+                }
+
                 const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    generationConfig: {
-                        temperature: 0.7,
-                        topP: 0.9,
-                        maxOutputTokens: 4096,
-                        responseMimeType: 'application/json',
-                    },
+                    model: modelConfig.name,
+                    generationConfig,
                 });
 
                 const chat = model.startChat({
@@ -86,7 +100,7 @@ export default async function handler(req, res) {
                     throw new Error('Invalid response: missing required text fields');
                 }
 
-                console.log(`Success with model: ${modelName}`);
+                console.log(`Success with model: ${modelConfig.name}`);
                 return res.status(200).json({
                     session_id: crypto.randomUUID(),
                     version: 1,
@@ -97,11 +111,11 @@ export default async function handler(req, res) {
                         english: parsed.english_text.split(/\s+/).length,
                         hebrew: parsed.hebrew_text.split(/\s+/).length,
                     },
-                    model_used: modelName
+                    model_used: modelConfig.name
                 });
 
             } catch (error) {
-                console.error(`Model ${modelName} failed:`, error.message);
+                console.error(`Model ${modelConfig.name} failed:`, error.message);
                 lastError = error;
 
                 // Track quota errors
@@ -112,7 +126,7 @@ export default async function handler(req, res) {
                     error.message.includes('quota')
                 )) {
                     quotaErrors++;
-                    console.log(`Model ${modelName} quota exceeded. Trying next model... (${quotaErrors}/${MODELS.length} quota errors)`);
+                    console.log(`Model ${modelConfig.name} quota exceeded. Trying next model... (${quotaErrors}/${MODELS.length} quota errors)`);
                 }
 
                 // Always try next model

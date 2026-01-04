@@ -2,9 +2,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { buildRefinePrompt } from './_lib/prompts.js';
 
 // Text-out models in order of preference
+// Models with thinking_level config (Gemini 3+) are marked
 const MODELS = [
-    'gemini-2.5-flash',
-    'gemini-2.5-flash-lite'
+    { name: 'gemini-3-flash-preview', thinkingLevel: 'low' },
+    { name: 'gemini-2.5-flash', thinkingLevel: null },
+    { name: 'gemini-2.5-flash-lite', thinkingLevel: null }
 ];
 
 export default async function handler(req, res) {
@@ -38,17 +40,29 @@ export default async function handler(req, res) {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         let lastError = null;
 
-        for (const modelName of MODELS) {
+        for (const modelConfig of MODELS) {
             try {
-                console.log(`Trying model: ${modelName}`);
+                console.log(`Trying model: ${modelConfig.name}`);
+
+                // Build generation config
+                const generationConfig = {
+                    temperature: 0.5,
+                    topP: 0.9,
+                    maxOutputTokens: 4096,
+                    responseMimeType: 'application/json',
+                };
+
+                // Add thinking level for Gemini 3+ models
+                if (modelConfig.thinkingLevel) {
+                    generationConfig.thinkingConfig = {
+                        thinkingBudget: modelConfig.thinkingLevel === 'low' ? 1024 :
+                            modelConfig.thinkingLevel === 'medium' ? 4096 : 8192
+                    };
+                }
+
                 const model = genAI.getGenerativeModel({
-                    model: modelName,
-                    generationConfig: {
-                        temperature: 0.5,
-                        topP: 0.9,
-                        maxOutputTokens: 4096,
-                        responseMimeType: 'application/json',
-                    },
+                    model: modelConfig.name,
+                    generationConfig,
                 });
 
                 const prompt = buildRefinePrompt(data);
@@ -71,7 +85,7 @@ export default async function handler(req, res) {
                     throw new Error('Invalid response: missing required text fields');
                 }
 
-                console.log(`Success with model: ${modelName}`);
+                console.log(`Success with model: ${modelConfig.name}`);
                 return res.status(200).json({
                     version: (data.current_version || 1) + 1,
                     english_text: parsed.english_text,
@@ -81,24 +95,14 @@ export default async function handler(req, res) {
                         english: parsed.english_text.split(/\s+/).length,
                         hebrew: parsed.hebrew_text.split(/\s+/).length,
                     },
-                    model_used: modelName
+                    model_used: modelConfig.name
                 });
 
             } catch (error) {
-                console.error(`Refine Model ${modelName} failed:`, error.message);
+                console.error(`Refine Model ${modelConfig.name} failed:`, error.message);
                 lastError = error;
 
-                // Continue to next model on rate limit or model not found
-                if (error.message && (
-                    error.message.includes('429') ||
-                    error.message.includes('QuotaFailure') ||
-                    error.message.includes('Too Many Requests') ||
-                    error.message.includes('not found') ||
-                    error.message.includes('does not exist')
-                )) {
-                    continue;
-                }
-                // For other errors, also try next model
+                // Continue to next model on any error
                 continue;
             }
         }
