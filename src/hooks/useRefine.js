@@ -22,12 +22,9 @@ export function useRefine() {
                 instruction
             })
 
-            if (response.success) {
-                setGenerated(response.data)
-                return true
-            } else {
-                throw new Error(response.error || 'Refinement failed')
-            }
+            // API returns data directly (english_text, hebrew_text, etc.)
+            setGenerated(response)
+            return true
         } catch (err) {
             setError(err.message)
             return false
