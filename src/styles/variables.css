@@ -1,4 +1,5 @@
-:root {
+/* Scoped CSS Variables - only apply within .ketubah-generator */
+.ketubah-generator {
   /* Colors - Premium Palette */
   /* Primary: Midnight Navy */
   --ketubah-primary: #1A202C;
