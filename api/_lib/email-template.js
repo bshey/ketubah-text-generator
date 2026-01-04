@@ -165,7 +165,7 @@ export function buildEmailHTML(englishText, hebrewText, couponCode) {
             <div class="coupon-box">
                 <h3>Gift: $30 Credit</h3>
                 <div class="coupon-desc">
-                    <p>This code gives you a <strong>$30 credit</strong> to offset the cost of our "Custom English & Hebrew Translation" service.</p>
+                    <p>This code gives you a <strong>$30 credit</strong> to offset the cost of our "Custom English & Hebrew Translation" service. Use your newly generated text to order any of our beautiful custom Ketubahs.</p>
                 </div>
                 <div class="coupon-code">${couponCode}</div>
             </div>

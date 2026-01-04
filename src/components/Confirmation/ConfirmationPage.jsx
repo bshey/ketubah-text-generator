@@ -21,7 +21,7 @@ export function ConfirmationPage({ email, englishText, hebrewText, couponCode, o
 
     return (
         <div className="ketubah-generator confirmation-page">
-            <header className="header">
+            <header className="confirmation-header">
                 <h1>✅ Your Ketubah Text is Ready!</h1>
                 <p className="subtitle">We've also sent a copy to {email}</p>
             </header>
@@ -35,7 +35,7 @@ export function ConfirmationPage({ email, englishText, hebrewText, couponCode, o
                             <h3>$30 Credit: Custom Text Service</h3>
                             <p style={{ maxWidth: '600px', margin: '0.5rem auto' }}>
                                 This code gives you a <strong>$30 credit</strong> to offset the cost of our "Custom English & Hebrew Translation" service.
-                                Use your newly generated text to order any of our beautiful Ketubahs with fully customized calligraphy.
+                                Use your newly generated text to order any of our beautiful custom Ketubahs.
                             </p>
                             <div className="coupon-code">{couponCode}</div>
                         </div>

@@ -27,22 +27,28 @@
 }
 
 /* Header - scoped to widget */
-.ketubah-generator .header {
+/* Header - scoped to widget */
+.ketubah-generator .confirmation-header {
     text-align: center;
     margin-bottom: var(--ketubah-space-xl);
     padding-top: var(--ketubah-space-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.ketubah-generator .header h1 {
+.ketubah-generator .confirmation-header h1 {
     font-family: var(--ketubah-font-heading);
     font-size: 3.5rem;
     font-weight: 600;
     color: var(--ketubah-primary);
     margin-bottom: var(--ketubah-space-xs);
     letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
-.ketubah-generator .header .subtitle {
+.ketubah-generator .confirmation-header .subtitle {
     font-family: var(--ketubah-font-heading);
     font-size: 1.25rem;
     color: var(--ketubah-accent);
