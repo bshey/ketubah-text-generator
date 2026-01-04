@@ -1,0 +1,16 @@
+{
+    "name": "ketubah-api",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "wrangler dev",
+        "deploy": "wrangler deploy"
+    },
+    "devDependencies": {
+        "wrangler": "^3.0.0"
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.21.0"
+    }
+}
