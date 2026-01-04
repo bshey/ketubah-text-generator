@@ -3,19 +3,19 @@
 /* Import Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Frank+Ruhl+Libre:wght@400;500;700&display=swap');
 
-/* Reset & base */
-*,
-*::before,
-*::after {
+/* Scoped reset - only applies INSIDE the widget container */
+.ketubah-generator *,
+.ketubah-generator *::before,
+.ketubah-generator *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body {
+/* Widget container background - scoped, not global body */
+.ketubah-generator {
     background-color: var(--ketubah-background);
     background-image: radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.1) 0%, transparent 50%);
-    min-height: 100vh;
 }
 
 /* Main container */
@@ -26,14 +26,14 @@ body {
     line-height: 1.6;
 }
 
-/* Header */
-.header {
+/* Header - scoped to widget */
+.ketubah-generator .header {
     text-align: center;
     margin-bottom: var(--ketubah-space-xl);
     padding-top: var(--ketubah-space-lg);
 }
 
-.header h1 {
+.ketubah-generator .header h1 {
     font-family: var(--ketubah-font-heading);
     font-size: 3.5rem;
     font-weight: 600;
@@ -42,7 +42,7 @@ body {
     letter-spacing: -0.02em;
 }
 
-.header .subtitle {
+.ketubah-generator .header .subtitle {
     font-family: var(--ketubah-font-heading);
     font-size: 1.25rem;
     color: var(--ketubah-accent);

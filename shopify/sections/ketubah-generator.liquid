@@ -2,7 +2,7 @@
   Ketubah Text Generator Section
   
   How to use:
-  1. Upload ketubah-widget.css and ketubah-widget.iife.js to: Settings > Files
+  1. Upload ketubah-widget.css and ketubah-widget.iife.js to Theme Assets
   2. Create a new Section in your theme with this code
   3. Add the section to a page template
   4. Set your Vercel API endpoint URL in the section settings
@@ -15,11 +15,21 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    min-height: 400px;
   }
   
   /* Override any theme styles that might conflict */
   .ketubah-generator-wrapper * {
     box-sizing: border-box;
+  }
+  
+  /* Loading state */
+  #ketubah-root:empty::before {
+    content: 'Loading Ketubah Generator...';
+    display: block;
+    text-align: center;
+    padding: 40px;
+    color: #666;
   }
 </style>
 
@@ -30,17 +40,26 @@
 <script>
   // Set the API endpoint from section settings
   window.KETUBAH_API_ENDPOINT = '{{ section.settings.api_endpoint }}';
-</script>
-
-<script src="{{ 'ketubah-widget.iife.js' | asset_url }}" defer></script>
-
-<script>
-  // Initialize widget after script loads
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.KetubanGenerator) {
+  
+  // Function to initialize the widget
+  function initKetubanWidget() {
+    if (window.KetubanGenerator && window.KetubanGenerator.init) {
+      console.log('Initializing Ketubah Generator...');
       window.KetubanGenerator.init('#ketubah-root');
+    } else {
+      console.error('KetubanGenerator not found. Make sure ketubah-widget.iife.js is uploaded to Assets.');
     }
-  });
+  }
+  
+  // Try to initialize after script loads
+  var widgetScript = document.createElement('script');
+  widgetScript.src = '{{ "ketubah-widget.iife.js" | asset_url }}';
+  widgetScript.onload = initKetubanWidget;
+  widgetScript.onerror = function() {
+    document.getElementById('ketubah-root').innerHTML = 
+      '<p style="color: red; text-align: center;">Error: Could not load ketubah-widget.iife.js. Make sure it is uploaded to Theme Assets.</p>';
+  };
+  document.head.appendChild(widgetScript);
 </script>
 
 {% schema %}

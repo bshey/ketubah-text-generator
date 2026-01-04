@@ -7,6 +7,11 @@ export default defineConfig(({ mode }) => {
   if (mode === 'widget') {
     return {
       plugins: [react()],
+      define: {
+        // Replace process.env references for browser compatibility
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        'process.env': JSON.stringify({})
+      },
       build: {
         lib: {
           entry: 'src/main.jsx',
