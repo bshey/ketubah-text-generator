@@ -4,6 +4,7 @@
  */
 
 import { generateKetubah, refineKetubah } from './gemini.js';
+import { sendKetubanEmail } from './email.js';
 
 // CORS handling
 function handleCORS(request, env) {
@@ -112,13 +113,21 @@ export default {
                     if (request.method !== 'POST') {
                         return jsonResponse({ error: 'Method not allowed' }, 405, origin, allowedOrigins);
                     }
-                    // TODO: Implement in Build 14
-                    return jsonResponse(
-                        { error: 'Not implemented - coming in Build 14' },
-                        501,
-                        origin,
-                        allowedOrigins
-                    );
+
+                    const emailData = await request.json();
+
+                    // Validate request
+                    if (!emailData.email) {
+                        return jsonResponse({ error: 'Email address is required' }, 400, origin, allowedOrigins);
+                    }
+                    if (!emailData.english_text || !emailData.hebrew_text) {
+                        return jsonResponse({ error: 'Ketubah text is required' }, 400, origin, allowedOrigins);
+                    }
+
+                    // Send email
+                    const emailResult = await sendKetubanEmail(emailData, env);
+
+                    return jsonResponse({ success: true, data: emailResult }, 200, origin, allowedOrigins);
 
                 default:
                     return jsonResponse({ error: 'Not found' }, 404, origin, allowedOrigins);
