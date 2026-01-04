@@ -39,6 +39,7 @@ export default async function handler(req, res) {
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         let lastError = null;
+        let quotaErrors = 0;
 
         for (const modelName of MODELS) {
             try {
@@ -104,19 +105,28 @@ export default async function handler(req, res) {
                 console.error(`Model ${modelName} failed:`, error.message);
                 lastError = error;
 
-                // Continue to next model on rate limit or model not found
+                // Track quota errors
                 if (error.message && (
                     error.message.includes('429') ||
                     error.message.includes('QuotaFailure') ||
                     error.message.includes('Too Many Requests') ||
-                    error.message.includes('not found') ||
-                    error.message.includes('does not exist')
+                    error.message.includes('quota')
                 )) {
-                    continue;
+                    quotaErrors++;
+                    console.log(`Model ${modelName} quota exceeded. Trying next model... (${quotaErrors}/${MODELS.length} quota errors)`);
                 }
-                // For other errors, also try next model
+
+                // Always try next model
                 continue;
             }
+        }
+
+        // Provide helpful error message
+        if (quotaErrors === MODELS.length) {
+            return res.status(429).json({
+                error: 'Daily API quota exceeded. Please try again tomorrow or upgrade to a paid Gemini API plan.',
+                details: 'All available AI models have reached their daily request limit.'
+            });
         }
 
         throw lastError || new Error('All models failed to generate text.');
