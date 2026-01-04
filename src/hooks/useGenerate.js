@@ -45,11 +45,8 @@ export function useGenerate() {
                 custom_length_words: customLengthWords
             })
 
-            if (response.success) {
-                setGenerated(response.data)
-            } else {
-                setError(response.error || 'Generation failed')
-            }
+            // API returns data directly (english_text, hebrew_text, etc.)
+            setGenerated(response)
         } catch (err) {
             console.error('Generation error:', err)
             setError(err.message || 'Failed to generate Ketubah. Please try again.')

@@ -1,9 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SYSTEM_PROMPT, buildGeneratePrompt } from './_lib/prompts.js';
 
-// Text-out models in order of preference (newest first)
+// Text-out models in order of preference
 const MODELS = [
-    'gemini-3-flash',
     'gemini-2.5-flash',
     'gemini-2.5-flash-lite'
 ];
