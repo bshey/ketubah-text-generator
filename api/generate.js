@@ -1,11 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SYSTEM_PROMPT, buildGeneratePrompt } from './_lib/prompts.js';
 
+// Text-out models in order of preference (newest first)
 const MODELS = [
+    'gemini-3-flash',
     'gemini-2.5-flash',
-    'gemini-2.5-flash-lite',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro'
+    'gemini-2.5-flash-lite'
 ];
 
 export default async function handler(req, res) {
@@ -121,11 +121,10 @@ export default async function handler(req, res) {
             }
         }
 
-        // Provide helpful error message
+        // Customer-friendly error for quota issues
         if (quotaErrors === MODELS.length) {
-            return res.status(429).json({
-                error: 'Daily API quota exceeded. Please try again tomorrow or upgrade to a paid Gemini API plan.',
-                details: 'All available AI models have reached their daily request limit.'
+            return res.status(503).json({
+                error: 'Our service is temporarily busy. Please try again in a few moments.'
             });
         }
 
@@ -133,6 +132,7 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('Generate error:', error);
-        return res.status(500).json({ error: error.message || 'Generation failed' });
+        // Generic customer-friendly error
+        return res.status(500).json({ error: 'Something went wrong. Please try again later.' });
     }
 }

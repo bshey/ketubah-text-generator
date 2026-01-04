@@ -1,11 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { buildRefinePrompt } from './_lib/prompts.js';
 
+// Text-out models in order of preference (newest first)
 const MODELS = [
+    'gemini-3-flash',
     'gemini-2.5-flash',
-    'gemini-2.5-flash-lite',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro'
+    'gemini-2.5-flash-lite'
 ];
 
 export default async function handler(req, res) {
@@ -108,6 +108,7 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('Refine error:', error);
-        return res.status(500).json({ error: error.message || 'Refinement failed' });
+        // Generic customer-friendly error
+        return res.status(500).json({ error: 'Something went wrong. Please try again later.' });
     }
 }
