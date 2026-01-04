@@ -32,9 +32,9 @@ export function ConfirmationPage({ email, englishText, hebrewText, couponCode, o
                     <div className="coupon-box" style={{ width: '100%', justifyContent: 'center' }}>
                         <span className="coupon-icon">🎁</span>
                         <div className="coupon-text" style={{ textAlign: 'center' }}>
-                            <h3>$60 Credit: Custom Text Service</h3>
+                            <h3>$30 Credit: Custom Text Service</h3>
                             <p style={{ maxWidth: '600px', margin: '0.5rem auto' }}>
-                                This code gives you a <strong>$60 credit</strong> to offset the cost of our "Custom English & Hebrew Translation" service.
+                                This code gives you a <strong>$30 credit</strong> to offset the cost of our "Custom English & Hebrew Translation" service.
                                 Use your newly generated text to order any of our beautiful Ketubahs with fully customized calligraphy.
                             </p>
                             <div className="coupon-code">{couponCode}</div>
