@@ -30,6 +30,12 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Partner names are required' });
         }
 
+        // Check for API key
+        if (!process.env.GEMINI_API_KEY) {
+            console.error('GEMINI_API_KEY environment variable is not set');
+            return res.status(500).json({ error: 'Server configuration error: API key not configured' });
+        }
+
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         let lastError = null;
 
