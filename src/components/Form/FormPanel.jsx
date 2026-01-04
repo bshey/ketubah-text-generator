@@ -31,7 +31,7 @@ export function FormPanel() {
 
     return (
         <div className="panel form-panel">
-            <h2>Create Your Ketubah</h2>
+            <h2>Create Your Ketubah Text</h2>
 
             {/* Partner 1 */}
             <fieldset className="fieldset">

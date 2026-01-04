@@ -56,10 +56,7 @@ function App({ options = {} }) {
 
     return (
         <div className="ketubah-generator">
-            <header className="header">
-                <h1>Ketubah Text Generator</h1>
-                <p className="subtitle">Create beautiful, personalized Ketubah text</p>
-            </header>
+            {/* Header removed - use separate Shopify section for page title */}
 
             {error && (
                 <div className="error-banner" role="alert">
