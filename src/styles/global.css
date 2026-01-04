@@ -212,3 +212,212 @@
     pointer-events: none;
     opacity: 0.3;
 }
+
+/* ===== FORM STYLES ===== */
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ketubah-space-md);
+}
+
+.fieldset {
+    border: 1px solid var(--ketubah-border);
+    border-radius: var(--ketubah-radius-md);
+    padding: var(--ketubah-space-md);
+    margin: 0;
+    background: var(--ketubah-background);
+}
+
+.fieldset legend {
+    font-weight: 600;
+    color: var(--ketubah-primary);
+    padding: 0 var(--ketubah-space-sm);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ketubah-space-md);
+}
+
+/* Style selector */
+.style-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--ketubah-space-sm);
+}
+
+@media (min-width: 768px) {
+    .style-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.style-option {
+    display: flex;
+    flex-direction: column;
+    padding: var(--ketubah-space-sm);
+    border: 2px solid var(--ketubah-border);
+    border-radius: var(--ketubah-radius-md);
+    cursor: pointer;
+    transition: all var(--ketubah-transition);
+    background: var(--ketubah-background);
+}
+
+.style-option:hover {
+    border-color: var(--ketubah-accent);
+}
+
+.style-option.selected {
+    border-color: var(--ketubah-accent);
+    background: rgba(184, 134, 11, 0.05);
+}
+
+.style-option input {
+    display: none;
+}
+
+.style-label {
+    font-weight: 600;
+    color: var(--ketubah-primary);
+    font-size: 0.9rem;
+}
+
+.style-desc {
+    font-size: 0.75rem;
+    color: var(--ketubah-secondary);
+    margin-top: 2px;
+}
+
+/* Generate button */
+.btn-generate {
+    width: 100%;
+    padding: var(--ketubah-space-md) var(--ketubah-space-lg);
+    font-size: 1.1rem;
+    margin-top: var(--ketubah-space-md);
+}
+
+/* ===== PREVIEW STYLES ===== */
+
+.preview-column {
+    position: sticky;
+    top: var(--ketubah-space-lg);
+    height: fit-content;
+}
+
+.scribe-message {
+    display: flex;
+    gap: var(--ketubah-space-sm);
+    padding: var(--ketubah-space-md);
+    background: rgba(184, 134, 11, 0.08);
+    border-radius: var(--ketubah-radius-md);
+    margin-bottom: var(--ketubah-space-lg);
+}
+
+.scribe-icon {
+    font-size: 1.5rem;
+}
+
+.scribe-message p {
+    font-style: italic;
+    color: var(--ketubah-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.preview-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ketubah-space-lg);
+}
+
+.text-section h3 {
+    font-family: var(--ketubah-font-heading);
+    font-size: 1rem;
+    margin-bottom: var(--ketubah-space-sm);
+    color: var(--ketubah-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.text-preview {
+    padding: var(--ketubah-space-md);
+    background: var(--ketubah-background);
+    border: 1px solid var(--ketubah-border);
+    border-radius: var(--ketubah-radius-md);
+    line-height: 1.8;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.text-preview p {
+    margin-bottom: var(--ketubah-space-md);
+}
+
+.text-preview p:last-child {
+    margin-bottom: 0;
+}
+
+.hebrew-text {
+    font-family: var(--ketubah-font-hebrew);
+    font-size: 1.1rem;
+}
+
+.preview-actions {
+    margin-top: var(--ketubah-space-lg);
+    text-align: center;
+}
+
+.preview-notice {
+    color: var(--ketubah-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--ketubah-space-md);
+}
+
+/* ===== LOADING STYLES ===== */
+
+.loading-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: var(--ketubah-space-lg);
+}
+
+.loading-subtext {
+    color: var(--ketubah-secondary);
+    font-size: 0.9rem;
+}
+
+/* ===== ERROR STYLES ===== */
+
+.error-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.error-dismiss {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--ketubah-error);
+    padding: 0;
+    line-height: 1;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 767px) {
+    .main-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-column {
+        position: static;
+    }
+}
