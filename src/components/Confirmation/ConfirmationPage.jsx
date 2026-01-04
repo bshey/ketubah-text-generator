@@ -1,8 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function ConfirmationPage({ email, englishText, hebrewText, couponCode, onStartOver }) {
     const [copiedEnglish, setCopiedEnglish] = useState(false)
     const [copiedHebrew, setCopiedHebrew] = useState(false)
+
+    // Scroll to top when page mounts
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [])
 
     const copyToClipboard = async (text, setCopied) => {
         try {
@@ -24,17 +29,17 @@ export function ConfirmationPage({ email, englishText, hebrewText, couponCode, o
             <main className="confirmation-content">
                 {/* Coupon Section */}
                 <div className="coupon-section">
-                    <div className="coupon-box">
+                    <div className="coupon-box" style={{ width: '100%', justifyContent: 'center' }}>
                         <span className="coupon-icon">🎁</span>
-                        <div className="coupon-text">
-                            <h3>Special Offer Just For You!</h3>
-                            <p>Use this code for a discount on your custom Ketubah:</p>
+                        <div className="coupon-text" style={{ textAlign: 'center' }}>
+                            <h3>$60 Credit: Custom Text Service</h3>
+                            <p style={{ maxWidth: '600px', margin: '0.5rem auto' }}>
+                                This code gives you a <strong>$60 credit</strong> to offset the cost of our "Custom English & Hebrew Translation" service.
+                                Use your newly generated text to order any of our beautiful Ketubahs with fully customized calligraphy.
+                            </p>
                             <div className="coupon-code">{couponCode}</div>
                         </div>
                     </div>
-                    <a href="https://maybie.co" className="btn btn-primary btn-shop">
-                        Shop Custom Ketubahs →
-                    </a>
                 </div>
 
                 {/* Copyable Text Sections */}
@@ -79,7 +84,7 @@ export function ConfirmationPage({ email, englishText, hebrewText, couponCode, o
                 {/* Footer Actions */}
                 <div className="confirmation-actions">
                     <button className="btn btn-secondary" onClick={onStartOver}>
-                        ← Create Another Ketubah
+                        ← Start Again
                     </button>
                     <a href="https://maybie.co" className="btn btn-primary">
                         Browse Our Collection →

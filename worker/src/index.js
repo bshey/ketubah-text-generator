@@ -45,9 +45,17 @@ function validateGenerateRequest(data) {
     if (!data.partner2?.english_name) errors.push('Partner 2 English name is required');
     if (!data.style) errors.push('Ketubah style is required');
 
-    const validStyles = ['Orthodox', 'Conservative', 'Reform', 'Secular', 'Interfaith', 'LGBTQ+'];
+    const validStyles = ['Orthodox', 'Conservative', 'Reform', 'Secular', 'Interfaith', 'LGBTQ+', 'Custom'];
     if (data.style && !validStyles.includes(data.style)) {
         errors.push(`Style must be one of: ${validStyles.join(', ')}`);
+    }
+
+    if (data.style === 'Custom' && !data.custom_style) {
+        errors.push('Description is required for Custom style');
+    }
+
+    if (data.text_length === 'custom' && !data.custom_length_words) {
+        errors.push('Target word count is required for Custom length');
     }
 
     return errors;
@@ -101,13 +109,26 @@ export default {
                     if (request.method !== 'POST') {
                         return jsonResponse({ error: 'Method not allowed' }, 405, origin, allowedOrigins);
                     }
-                    // TODO: Implement in Build 12
-                    return jsonResponse(
-                        { error: 'Not implemented - coming in Build 12' },
-                        501,
-                        origin,
-                        allowedOrigins
-                    );
+
+                    const refineData = await request.json();
+
+                    // Optimize validation
+                    if (!refineData.current_english || !refineData.current_hebrew) {
+                        return jsonResponse({ error: 'Current text is required' }, 400, origin, allowedOrigins);
+                    }
+                    if (!refineData.instruction) {
+                        return jsonResponse({ error: 'Refinement instruction is required' }, 400, origin, allowedOrigins);
+                    }
+
+                    // Check API key
+                    if (!env.GEMINI_API_KEY) {
+                        return jsonResponse({ error: 'Gemini API key not configured' }, 500, origin, allowedOrigins);
+                    }
+
+                    // Refine Ketubah
+                    const refinedResult = await refineKetubah(refineData, env);
+
+                    return jsonResponse({ success: true, data: refinedResult }, 200, origin, allowedOrigins);
 
                 case '/api/send-text':
                     if (request.method !== 'POST') {
@@ -134,6 +155,17 @@ export default {
             }
         } catch (error) {
             console.error('Worker error:', error);
+
+            // Handle Rate Limiting
+            if (error.message && (error.message.includes('429') || error.message.includes('QuotaFailure') || error.message.includes('Too Many Requests'))) {
+                return jsonResponse(
+                    { error: 'High Traffic', message: 'We are experiencing high traffic. Please try again in 1 minute.' },
+                    429,
+                    origin,
+                    allowedOrigins
+                );
+            }
+
             return jsonResponse(
                 { error: 'Internal server error', message: error.message },
                 500,

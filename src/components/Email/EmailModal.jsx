@@ -3,7 +3,6 @@ import { useKetubanStore } from '../../store/ketubanStore'
 
 export function EmailModal({ onSubmit, onClose }) {
     const [email, setEmail] = useState('')
-    const [consent, setConsent] = useState(false)
     const [error, setError] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -23,11 +22,6 @@ export function EmailModal({ onSubmit, onClose }) {
 
         if (!validateEmail(email)) {
             setError('Please enter a valid email address')
-            return
-        }
-
-        if (!consent) {
-            setError('Please agree to receive your Ketubah text via email')
             return
         }
 
@@ -51,7 +45,7 @@ export function EmailModal({ onSubmit, onClose }) {
                 <div className="modal-header">
                     <span className="modal-icon">✉️</span>
                     <h2>Get Your Ketubah Text</h2>
-                    <p>Enter your email to receive a copyable version of your personalized Ketubah text, plus a special discount code!</p>
+                    <p>Enter your email to receive a copyable version of your personalized Ketubah text, plus a special offer!</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -75,18 +69,6 @@ export function EmailModal({ onSubmit, onClose }) {
                         />
                     </div>
 
-                    <div className="form-group checkbox-group">
-                        <label className="checkbox-label">
-                            <input
-                                type="checkbox"
-                                checked={consent}
-                                onChange={(e) => setConsent(e.target.checked)}
-                                disabled={isSubmitting}
-                            />
-                            <span>I agree to receive my Ketubah text and occasional updates about ketubah products</span>
-                        </label>
-                    </div>
-
                     <button
                         type="submit"
                         className="btn btn-primary btn-full"
@@ -97,7 +79,7 @@ export function EmailModal({ onSubmit, onClose }) {
                 </form>
 
                 <p className="modal-footer-text">
-                    Your email will only be used to deliver your Ketubah text and occasional product updates. We never share your information.
+                    Your email will only be used to deliver your Ketubah text. We never share your information.
                 </p>
             </div>
         </div>

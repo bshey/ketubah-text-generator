@@ -1,16 +1,22 @@
 import { useCallback } from 'react'
 import { useKetubanStore } from '../store/ketubanStore'
 import { generateKetubah } from '../services/api'
+import { useHebrewDate } from './useHebrewDate'
 
 export function useGenerate() {
     const {
-        partner1, partner2, weddingDate, location, style, story,
+        partner1, partner2, weddingDate, isAfterSunset, location, style, customStyle, story,
+        textLength, customLengthWords,
         setGenerating, setGenerated, setError
     } = useKetubanStore()
 
+    const { hebrewEnglish } = useHebrewDate(weddingDate, isAfterSunset)
+
     const canGenerate = Boolean(
         partner1.english_name &&
+        (partner1.hebrew_name || partner1.isPhonetic) &&
         partner2.english_name &&
+        (partner2.hebrew_name || partner2.isPhonetic) &&
         weddingDate &&
         location.city &&
         style
@@ -30,9 +36,13 @@ export function useGenerate() {
                 partner1,
                 partner2,
                 wedding_date: weddingDate,
+                hebrew_date: hebrewEnglish,
                 location,
                 style,
-                story
+                custom_style: customStyle,
+                story,
+                text_length: textLength,
+                custom_length_words: customLengthWords
             })
 
             if (response.success) {
@@ -46,7 +56,7 @@ export function useGenerate() {
         } finally {
             setGenerating(false)
         }
-    }, [partner1, partner2, weddingDate, location, style, story, canGenerate, setError, setGenerating, setGenerated])
+    }, [partner1, partner2, weddingDate, isAfterSunset, hebrewEnglish, location, style, customStyle, story, textLength, customLengthWords, canGenerate, setError, setGenerating, setGenerated])
 
     return { generate, canGenerate }
 }

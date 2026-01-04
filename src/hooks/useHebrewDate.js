@@ -71,7 +71,7 @@ function getEnglishMonthName(month) {
     return monthNames[month] || ''
 }
 
-export function useHebrewDate(gregorianDate) {
+export function useHebrewDate(gregorianDate, isAfterSunset = false) {
     return useMemo(() => {
         if (!gregorianDate) {
             return {
@@ -84,7 +84,12 @@ export function useHebrewDate(gregorianDate) {
         try {
             // Parse the date string (format: YYYY-MM-DD)
             const [year, month, day] = gregorianDate.split('-').map(Number)
-            const date = new Date(year, month - 1, day)
+            let date = new Date(year, month - 1, day)
+
+            // If after sunset, the Hebrew date effectively starts the next day
+            if (isAfterSunset) {
+                date.setDate(date.getDate() + 1)
+            }
 
             // Convert to Hebrew date
             const hdate = new HDate(date)
@@ -102,5 +107,5 @@ export function useHebrewDate(gregorianDate) {
                 hdate: null
             }
         }
-    }, [gregorianDate])
+    }, [gregorianDate, isAfterSunset])
 }

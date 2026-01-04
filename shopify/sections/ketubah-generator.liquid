@@ -1,0 +1,62 @@
+{% comment %}
+  Ketubah Text Generator Section
+  
+  How to use:
+  1. Upload ketubah-widget.css and ketubah-widget.iife.js to: Settings > Files
+  2. Create a new Section in your theme with this code
+  3. Add the section to a page template
+  
+  Environment Variables (set in Vercel):
+  - GEMINI_API_KEY
+  - RESEND_API_KEY
+  - FROM_EMAIL
+  - OWNER_BCC_EMAIL
+  - STATIC_COUPON_CODE
+{% endcomment %}
+
+{{ 'ketubah-widget.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .ketubah-generator-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Override any theme styles that might conflict */
+  .ketubah-generator-wrapper * {
+    box-sizing: border-box;
+  }
+</style>
+
+<div class="ketubah-generator-wrapper">
+  <div id="ketubah-root"></div>
+</div>
+
+<script>
+  // Set the API endpoint for production
+  window.KETUBAH_API_ENDPOINT = 'https://YOUR-VERCEL-APP.vercel.app';
+</script>
+
+<script src="{{ 'ketubah-widget.iife.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Ketubah Generator",
+  "settings": [
+    {
+      "type": "text",
+      "id": "api_endpoint",
+      "label": "API Endpoint URL",
+      "default": "https://ketubah-text-generator.vercel.app",
+      "info": "Your Vercel deployment URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ketubah Generator",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

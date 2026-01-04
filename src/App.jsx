@@ -9,7 +9,7 @@ import { sendText } from './services/api'
 
 function App({ options = {} }) {
     const {
-        englishText, hebrewText, isGenerating, error,
+        englishText, hebrewText, isGenerating, isRefining, error,
         showEmailModal, setShowEmailModal, setError
     } = useKetubanStore()
     const { generate, canGenerate } = useGenerate()
@@ -30,7 +30,7 @@ function App({ options = {} }) {
 
             // Store email and coupon for confirmation page
             setSubmittedEmail(email)
-            setCouponCode(response.data?.coupon_code || 'FREETEXT')
+            setCouponCode(response.data?.coupon_code || 'FREETEXT4783')
             setShowEmailModal(false)
             setShowConfirmation(true)
         } catch (err) {
@@ -58,7 +58,7 @@ function App({ options = {} }) {
         <div className="ketubah-generator">
             <header className="header">
                 <h1>Ketubah Text Generator</h1>
-                <p className="subtitle">Powered by The Wise Scribe</p>
+                <p className="subtitle">Create beautiful, personalized Ketubah text</p>
             </header>
 
             {error && (
@@ -74,31 +74,36 @@ function App({ options = {} }) {
                 </div>
             )}
 
-            <main className="main-layout">
-                <div className="form-column">
-                    <FormPanel />
+            <main className="main-layout layout-centered">
+                {!hasGenerated ? (
+                    <div className="form-column">
+                        <FormPanel />
 
-                    <button
-                        className="btn btn-primary btn-generate"
-                        onClick={generate}
-                        disabled={!canGenerate || isGenerating}
-                    >
-                        {isGenerating ? 'Crafting your Ketubah...' : '✨ Generate Ketubah'}
-                    </button>
-                </div>
-
-                {hasGenerated && (
+                        <button
+                            className="btn btn-primary btn-generate"
+                            onClick={generate}
+                            disabled={!canGenerate || isGenerating}
+                        >
+                            {isGenerating ? 'Crafting your Ketubah...' : '✨ Generate Text'}
+                        </button>
+                    </div>
+                ) : (
                     <div className="preview-column">
-                        <PreviewPanel onGetText={() => setShowEmailModal(true)} />
+                        <PreviewPanel
+                            onGetText={() => setShowEmailModal(true)}
+                            onStartOver={() => useKetubanStore.getState().reset()}
+                        />
                     </div>
                 )}
             </main>
 
-            {isGenerating && (
+            {(isGenerating || isRefining) && (
                 <div className="loading-overlay">
                     <div className="loading-spinner" />
-                    <p className="loading-text">The Wise Scribe is crafting your Ketubah...</p>
-                    <p className="loading-subtext">This may take 10-20 seconds</p>
+                    <p className="loading-text">
+                        {isRefining ? 'Polishing your changes...' : 'Crafting your Ketubah...'}
+                    </p>
+                    <p className="loading-text">This may take 10-20 seconds</p>
                 </div>
             )}
 

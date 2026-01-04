@@ -1,6 +1,5 @@
 /**
- * The Wise Scribe - System Prompt and Prompt Builders
- * For generating personalized Ketubah text
+ * Prompts for Ketubah Text Generation
  */
 
 export const SYSTEM_PROMPT = `You are an expert Ketubah scribe assisting modern couples in creating meaningful marriage contracts.
@@ -47,32 +46,41 @@ Generate the text as a SINGLE PARAGRAPH that seamlessly flows through:
 - The output text MUST be a single, continuous paragraph (no line breaks)
 - Respect the requested word count/length`;
 
+function getStyleGuidelines(style) {
+    const guidelines = {
+        Orthodox: 'Include traditional Aramaic opening, kinyan formula, mohar (symbolic bride price), specific legal obligations. Use formal Hebrew.',
+        Conservative: 'Use egalitarian language with both partners making equal commitments. Include Lieberman clause for mutual consent. Balance tradition with modernity.',
+        Reform: 'Focus on personal covenant and mutual growth. Emphasize love, support, and building a Jewish home together. Modern language acceptable.',
+        Secular: 'No religious references. Focus on commitment, partnership, shared values. Emphasize the relationship and promises to each other.',
+        Interfaith: 'Universal themes of love and commitment. Respectful language that honors both traditions. Focus on shared values and future together.',
+        'LGBTQ+': 'Gender-neutral language throughout. Celebrate the union as equal partners. Use inclusive terminology. Emphasize love and chosen family.'
+    };
+
+    return guidelines[style] || guidelines.Reform;
+}
+
 export function buildGeneratePrompt(data) {
-  const hebrewDate = data.hebrew_date || 'the Hebrew date corresponding to their wedding';
+    const hebrewDate = data.hebrew_date || 'the Hebrew date corresponding to their wedding';
 
-  // Partner Name Logic
-  const p1Hebrew = data.partner1.isPhonetic
-    ? `Transliterate English name "${data.partner1.english_name}" into Hebrew characters phonetically`
-    : (data.partner1.hebrew_name || 'Transliterate English name');
+    const p1Hebrew = data.partner1.isPhonetic
+        ? `Transliterate English name "${data.partner1.english_name}" into Hebrew characters phonetically`
+        : (data.partner1.hebrew_name || 'Transliterate English name');
 
-  const p2Hebrew = data.partner2.isPhonetic
-    ? `Transliterate English name "${data.partner2.english_name}" into Hebrew characters phonetically`
-    : (data.partner2.hebrew_name || 'Transliterate English name');
+    const p2Hebrew = data.partner2.isPhonetic
+        ? `Transliterate English name "${data.partner2.english_name}" into Hebrew characters phonetically`
+        : (data.partner2.hebrew_name || 'Transliterate English name');
 
-  // Style Logic
-  const styleInstruction = data.style === 'Custom'
-    ? `Custom Style Requirements: ${data.custom_style}`
-    : getStyleGuidelines(data.style);
+    const styleInstruction = data.style === 'Custom'
+        ? `Custom Style Requirements: ${data.custom_style}`
+        : getStyleGuidelines(data.style);
 
-  // Length Logic
-  // Length Logic
-  let midPoint = 150;
-  if (data.text_length === 'short') midPoint = 88; // Midpoint of 50-125
-  if (data.text_length === 'medium') midPoint = 150; // Midpoint of 125-175
-  if (data.text_length === 'long') midPoint = 200; // Midpoint of 175-225
-  if (data.text_length === 'custom' && data.custom_length_words) midPoint = parseInt(data.custom_length_words);
+    let midPoint = 150;
+    if (data.text_length === 'short') midPoint = 88;
+    if (data.text_length === 'medium') midPoint = 150;
+    if (data.text_length === 'long') midPoint = 200;
+    if (data.text_length === 'custom' && data.custom_length_words) midPoint = parseInt(data.custom_length_words);
 
-  const lengthInstruction = `
+    const lengthInstruction = `
 ## CRITICAL WORD COUNT REQUIREMENT
 Target: EXACTLY ${midPoint} words for the English text.
 - Minimum: ${midPoint - 5} words
@@ -82,7 +90,7 @@ Target: EXACTLY ${midPoint} words for the English text.
 - If your draft is too short, add meaningful content.
 This is a hard requirement. Text outside this range will be rejected.`;
 
-  return `Create a ${data.style} Ketubah for this couple:
+    return `Create a ${data.style} Ketubah for this couple:
 
 ## Partner Information
 Partner 1: ${data.partner1.english_name} (Hebrew: ${p1Hebrew})
@@ -110,21 +118,8 @@ Create beautiful, personalized bilingual Ketubah text that:
 6. **CRITICAL**: The English text MUST be between ${midPoint - 5} and ${midPoint + 5} words. Count carefully!`;
 }
 
-function getStyleGuidelines(style) {
-  const guidelines = {
-    Orthodox: 'Include traditional Aramaic opening, kinyan formula, mohar (symbolic bride price), specific legal obligations. Use formal Hebrew.',
-    Conservative: 'Use egalitarian language with both partners making equal commitments. Include Lieberman clause for mutual consent. Balance tradition with modernity.',
-    Reform: 'Focus on personal covenant and mutual growth. Emphasize love, support, and building a Jewish home together. Modern language acceptable.',
-    Secular: 'No religious references. Focus on commitment, partnership, shared values. Emphasize the relationship and promises to each other.',
-    Interfaith: 'Universal themes of love and commitment. Respectful language that honors both traditions. Focus on shared values and future together.',
-    'LGBTQ+': 'Gender-neutral language throughout. Celebrate the union as equal partners. Use inclusive terminology. Emphasize love and chosen family.'
-  };
-
-  return guidelines[style] || guidelines.Reform;
-}
-
 export function buildRefinePrompt(data) {
-  return `The couple wants to refine their Ketubah text.
+    return `The couple wants to refine their Ketubah text.
 
 ## Current English Text:
 ${data.current_english}

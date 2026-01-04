@@ -4,9 +4,10 @@ compatibility_date = "2024-01-01"
 
 [vars]
 ALLOWED_ORIGINS = "http://localhost:5173,https://your-store.myshopify.com"
-STATIC_COUPON_CODE = "FREETEXT"
+STATIC_COUPON_CODE = "FREETEXT4783"
+FROM_EMAIL = "Maybie & Co. <hello@maybie.co>"
+OWNER_BCC_EMAIL = "hello@maybie.co"
 
 # Secrets (add via: wrangler secret put SECRET_NAME)
 # GEMINI_API_KEY
-# SENDGRID_API_KEY  
-# OWNER_BCC_EMAIL
+# SENDGRID_API_KEY

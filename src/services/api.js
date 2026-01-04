@@ -1,4 +1,5 @@
-const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8787'
+// API endpoint - uses relative path in production (Vercel), localhost in dev
+const API_ENDPOINT = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8787')
 
 export async function generateKetubah(data) {
     const response = await fetch(`${API_ENDPOINT}/api/generate`, {
@@ -9,7 +10,7 @@ export async function generateKetubah(data) {
 
     if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || 'Generation failed')
+        throw new Error(error.message || error.error || 'Generation failed')
     }
 
     return response.json()

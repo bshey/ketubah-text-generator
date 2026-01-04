@@ -3,12 +3,14 @@ import { useHebrewDate } from '../../hooks/useHebrewDate'
 
 export function FormPanel() {
     const {
-        partner1, partner2, weddingDate, location, style, story,
-        setPartner1, setPartner2, setWeddingDate, setLocation, setStyle, setStory,
+        partner1, partner2, weddingDate, isAfterSunset, location, style, customStyle,
+        textLength, customLengthWords, story,
+        setPartner1, setPartner2, setWeddingDate, setIsAfterSunset, setLocation,
+        setStyle, setCustomStyle, setTextLength, setCustomLengthWords, setStory,
         isGenerating
     } = useKetubanStore()
 
-    const { hebrew: hebrewDate, hebrewEnglish } = useHebrewDate(weddingDate)
+    const { hebrew: hebrewDate, hebrewEnglish } = useHebrewDate(weddingDate, isAfterSunset)
 
     const styles = [
         { value: 'Reform', label: 'Reform', desc: 'Modern covenant language, personal connection' },
@@ -17,6 +19,14 @@ export function FormPanel() {
         { value: 'Secular', label: 'Secular', desc: 'Values-based, no religious references' },
         { value: 'Interfaith', label: 'Interfaith', desc: 'Universal themes, honors both traditions' },
         { value: 'LGBTQ+', label: 'LGBTQ+', desc: 'Gender-neutral, equal partnership' },
+        { value: 'Custom', label: 'Custom Style', desc: 'Define your own style requirements' },
+    ]
+
+    const lengths = [
+        { value: 'short', label: 'Short', desc: '50-125 words' },
+        { value: 'medium', label: 'Medium', desc: '125-175 words (Recommended)', isRecommended: true },
+        { value: 'long', label: 'Long', desc: '175-225 words' },
+        { value: 'custom', label: 'Custom', desc: 'Specify target length' },
     ]
 
     return (
@@ -27,30 +37,46 @@ export function FormPanel() {
             <fieldset className="fieldset">
                 <legend>Partner 1</legend>
                 <div className="form-group">
-                    <label htmlFor="p1-english">Full Name (English) *</label>
+                    <label htmlFor="p1-english">First Name (Last Name Optional) *</label>
                     <input
                         id="p1-english"
                         type="text"
                         value={partner1.english_name}
                         onChange={(e) => setPartner1({ english_name: e.target.value })}
-                        placeholder="Sarah Cohen"
+                        placeholder="Sarah"
                         disabled={isGenerating}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="p1-hebrew">Hebrew Name (optional)</label>
+                    <label htmlFor="p1-hebrew">Hebrew Name *</label>
+                    <div className="checkbox-row">
+                        <input
+                            id="p1-phonetic"
+                            type="checkbox"
+                            checked={partner1.isPhonetic}
+                            onChange={(e) => setPartner1({
+                                isPhonetic: e.target.checked,
+                                hebrew_name: e.target.checked ? '' : partner1.hebrew_name
+                            })}
+                            disabled={isGenerating}
+                        />
+                        <label htmlFor="p1-phonetic" className="checkbox-label">Use phonetic translation</label>
+                    </div>
                     <input
                         id="p1-hebrew"
                         type="text"
-                        className="hebrew-input"
+                        className={`hebrew-input ${partner1.isPhonetic ? 'disabled-input' : ''}`}
                         value={partner1.hebrew_name}
                         onChange={(e) => setPartner1({ hebrew_name: e.target.value })}
                         placeholder="שרה בת דוד ורבקה"
                         dir="rtl"
-                        disabled={isGenerating}
+                        disabled={isGenerating || partner1.isPhonetic}
+                        required={!partner1.isPhonetic}
                     />
-                    <span className="form-hint">Format: Name ben/bat Father's Name (e.g., שרה בת דוד)</span>
+                    {!partner1.isPhonetic && (
+                        <span className="form-hint">Format: Name ben/bat Father's Name (e.g., שרה בת דוד)</span>
+                    )}
                 </div>
             </fieldset>
 
@@ -58,30 +84,46 @@ export function FormPanel() {
             <fieldset className="fieldset">
                 <legend>Partner 2</legend>
                 <div className="form-group">
-                    <label htmlFor="p2-english">Full Name (English) *</label>
+                    <label htmlFor="p2-english">First Name (Last Name Optional) *</label>
                     <input
                         id="p2-english"
                         type="text"
                         value={partner2.english_name}
                         onChange={(e) => setPartner2({ english_name: e.target.value })}
-                        placeholder="Michael Levy"
+                        placeholder="Michael"
                         disabled={isGenerating}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="p2-hebrew">Hebrew Name (optional)</label>
+                    <label htmlFor="p2-hebrew">Hebrew Name *</label>
+                    <div className="checkbox-row">
+                        <input
+                            id="p2-phonetic"
+                            type="checkbox"
+                            checked={partner2.isPhonetic}
+                            onChange={(e) => setPartner2({
+                                isPhonetic: e.target.checked,
+                                hebrew_name: e.target.checked ? '' : partner2.hebrew_name
+                            })}
+                            disabled={isGenerating}
+                        />
+                        <label htmlFor="p2-phonetic" className="checkbox-label">Use phonetic translation</label>
+                    </div>
                     <input
                         id="p2-hebrew"
                         type="text"
-                        className="hebrew-input"
+                        className={`hebrew-input ${partner2.isPhonetic ? 'disabled-input' : ''}`}
                         value={partner2.hebrew_name}
                         onChange={(e) => setPartner2({ hebrew_name: e.target.value })}
                         placeholder="מיכאל בן יעקב ולאה"
                         dir="rtl"
-                        disabled={isGenerating}
+                        disabled={isGenerating || partner2.isPhonetic}
+                        required={!partner2.isPhonetic}
                     />
-                    <span className="form-hint">Format: Name ben/bat Father's Name</span>
+                    {!partner2.isPhonetic && (
+                        <span className="form-hint">Format: Name ben/bat Father's Name</span>
+                    )}
                 </div>
             </fieldset>
 
@@ -90,14 +132,26 @@ export function FormPanel() {
                 <legend>Wedding Details</legend>
                 <div className="form-group">
                     <label htmlFor="wedding-date">Wedding Date *</label>
-                    <input
-                        id="wedding-date"
-                        type="date"
-                        value={weddingDate}
-                        onChange={(e) => setWeddingDate(e.target.value)}
-                        disabled={isGenerating}
-                        required
-                    />
+                    <div className="date-row">
+                        <input
+                            id="wedding-date"
+                            type="date"
+                            value={weddingDate}
+                            onChange={(e) => setWeddingDate(e.target.value)}
+                            disabled={isGenerating}
+                            required
+                        />
+                        <div className="checkbox-wrapper">
+                            <input
+                                id="sunset-check"
+                                type="checkbox"
+                                checked={isAfterSunset}
+                                onChange={(e) => setIsAfterSunset(e.target.checked)}
+                                disabled={isGenerating}
+                            />
+                            <label htmlFor="sunset-check">After Sunset?</label>
+                        </div>
+                    </div>
                     {hebrewDate && (
                         <div className="hebrew-date-display">
                             <span className="hebrew-date-label">Hebrew Date:</span>
@@ -131,7 +185,7 @@ export function FormPanel() {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="country">Country</label>
+                        <label htmlFor="country">Country (Optional)</label>
                         <input
                             id="country"
                             type="text"
@@ -144,12 +198,15 @@ export function FormPanel() {
                 </div>
             </fieldset>
 
-            {/* Style Selection */}
+            {/* Text Style Selection */}
             <fieldset className="fieldset">
-                <legend>Ketubah Style *</legend>
+                <legend>Text Style *</legend>
                 <div className="style-grid">
                     {styles.map((s) => (
-                        <label key={s.value} className={`style-option ${style === s.value ? 'selected' : ''}`}>
+                        <label
+                            key={s.value}
+                            className={`style-option ${style === s.value ? 'selected' : ''} ${s.value === 'Custom' ? 'custom-option' : ''}`}
+                        >
                             <input
                                 type="radio"
                                 name="style"
@@ -163,6 +220,57 @@ export function FormPanel() {
                         </label>
                     ))}
                 </div>
+                {style === 'Custom' && (
+                    <div className="form-group custom-style-input">
+                        <label htmlFor="custom-style">Describe your desired style:</label>
+                        <textarea
+                            id="custom-style"
+                            value={customStyle}
+                            onChange={(e) => setCustomStyle(e.target.value)}
+                            placeholder="e.g., A mix of traditional poetic language but with modern egalitarian values..."
+                            rows={3}
+                            disabled={isGenerating}
+                        />
+                    </div>
+                )}
+            </fieldset>
+
+            {/* Text Length Selection */}
+            <fieldset className="fieldset">
+                <legend>Text Length *</legend>
+                <div className="style-grid length-grid">
+                    {lengths.map((l) => (
+                        <label key={l.value} className={`style-option ${textLength === l.value ? 'selected' : ''}`}>
+                            <input
+                                type="radio"
+                                name="length"
+                                value={l.value}
+                                checked={textLength === l.value}
+                                onChange={(e) => setTextLength(e.target.value)}
+                                disabled={isGenerating}
+                            />
+                            <div className="length-label-group">
+                                <span className="style-label">{l.label}</span>
+                                {l.isRecommended && <span className="tag-recommended">Recommended</span>}
+                            </div>
+                            <span className="style-desc">{l.desc}</span>
+                        </label>
+                    ))}
+                </div>
+                {textLength === 'custom' && (
+                    <div className="form-group custom-length-input">
+                        <label htmlFor="custom-length">Target Word Count (Max 500):</label>
+                        <input
+                            id="custom-length"
+                            type="number"
+                            min="50"
+                            max="500"
+                            value={customLengthWords}
+                            onChange={(e) => setCustomLengthWords(Math.min(500, Math.max(0, parseInt(e.target.value) || 0)))}
+                            disabled={isGenerating}
+                        />
+                    </div>
+                )}
             </fieldset>
 
             {/* Story */}

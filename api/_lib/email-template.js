@@ -1,13 +1,7 @@
 /**
- * Email Service
- * Handles sending Ketubah text via email using Resend API
- * (Resend is simpler and has better free tier than SendGrid)
- */
-
-/**
  * Build HTML email template for Ketubah text
  */
-function buildEmailHTML(englishText, hebrewText, couponCode) {
+export function buildEmailHTML(englishText, hebrewText, couponCode) {
     return `
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
@@ -25,7 +19,7 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
             max-width: 680px;
             margin: 0 auto;
             padding: 40px 20px;
-            background-color: #F9F7F2; /* Soft Cream */
+            background-color: #F9F7F2;
         }
         .container {
             background: white;
@@ -38,7 +32,7 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
             text-align: center;
             padding: 40px 0 30px;
             background: white;
-            border-bottom: 3px solid #436852; /* Accent Green */
+            border-bottom: 3px solid #436852;
         }
         .header h1 {
             color: #1A202C;
@@ -82,7 +76,7 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
             font-size: 19px;
         }
         .coupon-box {
-            background: #F0F4F2; /* Light Green Tint */
+            background: #F0F4F2;
             color: #1A202C;
             padding: 30px;
             border-radius: 12px;
@@ -118,14 +112,14 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
         .cta-section {
             text-align: center;
             padding: 40px;
-            background: #1A202C; /* Dark Navy */
+            background: #1A202C;
             color: white;
             border-radius: 0 0 16px 16px; 
-            margin: 0 -40px -40px -40px; /* Bleed to edges */
+            margin: 0 -40px -40px -40px;
         }
         .cta-btn {
             display: inline-block;
-            background: #D4AF37; /* Gold */
+            background: #D4AF37;
             color: #1A202C;
             padding: 16px 32px;
             text-decoration: none;
@@ -133,7 +127,6 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
             font-weight: 600;
             margin-top: 20px;
             font-size: 16px;
-            transition: opacity 0.2s;
         }
         .footer {
             text-align: center;
@@ -177,8 +170,6 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
                 <div class="coupon-code">${couponCode}</div>
             </div>
             ` : ''}
-
-            <!-- CTA Section inside content wrapper -->
         </div>
 
         <div class="cta-section">
@@ -195,67 +186,4 @@ function buildEmailHTML(englishText, hebrewText, couponCode) {
 </body>
 </html>
 `;
-}
-
-/**
- * Send email using Resend API
- * https://resend.com/docs/api-reference/emails/send-email
- */
-export async function sendKetubanEmail(data, env) {
-    const { email, english_text, hebrew_text } = data;
-
-    // Validate email
-    if (!email || !email.includes('@')) {
-        throw new Error('Valid email address is required');
-    }
-
-    if (!english_text || !hebrew_text) {
-        throw new Error('Ketubah text is required');
-    }
-
-    const couponCode = env.STATIC_COUPON_CODE || 'FREETEXT4783';
-    const html = buildEmailHTML(english_text, hebrew_text, couponCode);
-
-    // If no email API key, we'll simulate success for development
-    if (!env.RESEND_API_KEY) {
-        console.log('No RESEND_API_KEY configured - simulating email send');
-        return {
-            success: true,
-            message: 'Email simulated (no API key)',
-            email,
-            coupon_code: couponCode
-        };
-    }
-
-    // Send via Resend API
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            from: env.FROM_EMAIL || 'Ketubah Generator <ketubah@yourdomain.com>',
-            to: [email],
-            bcc: env.OWNER_BCC_EMAIL ? [env.OWNER_BCC_EMAIL] : [],
-            subject: '📜 Your Personalized Ketubah Text',
-            html: html,
-        }),
-    });
-
-    if (!response.ok) {
-        const error = await response.json();
-        console.error('Resend API error:', error);
-        throw new Error('Failed to send email');
-    }
-
-    const result = await response.json();
-
-    return {
-        success: true,
-        message: 'Email sent successfully',
-        email,
-        coupon_code: couponCode,
-        email_id: result.id
-    };
 }
