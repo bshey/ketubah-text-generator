@@ -1,5 +1,6 @@
-// API endpoint - uses relative path in production (Vercel), localhost in dev
-const API_ENDPOINT = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8787')
+// API endpoint - checks Shopify global first, then Vite env
+const API_ENDPOINT = window.KETUBAH_API_ENDPOINT ||
+    (import.meta.env.PROD ? '' : (import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8787'))
 
 export async function generateKetubah(data) {
     const response = await fetch(`${API_ENDPOINT}/api/generate`, {

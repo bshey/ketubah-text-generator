@@ -5,13 +5,7 @@
   1. Upload ketubah-widget.css and ketubah-widget.iife.js to: Settings > Files
   2. Create a new Section in your theme with this code
   3. Add the section to a page template
-  
-  Environment Variables (set in Vercel):
-  - GEMINI_API_KEY
-  - RESEND_API_KEY
-  - FROM_EMAIL
-  - OWNER_BCC_EMAIL
-  - STATIC_COUPON_CODE
+  4. Set your Vercel API endpoint URL in the section settings
 {% endcomment %}
 
 {{ 'ketubah-widget.css' | asset_url | stylesheet_tag }}
@@ -34,11 +28,20 @@
 </div>
 
 <script>
-  // Set the API endpoint for production
-  window.KETUBAH_API_ENDPOINT = 'https://YOUR-VERCEL-APP.vercel.app';
+  // Set the API endpoint from section settings
+  window.KETUBAH_API_ENDPOINT = '{{ section.settings.api_endpoint }}';
 </script>
 
 <script src="{{ 'ketubah-widget.iife.js' | asset_url }}" defer></script>
+
+<script>
+  // Initialize widget after script loads
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.KetubanGenerator) {
+      window.KetubanGenerator.init('#ketubah-root');
+    }
+  });
+</script>
 
 {% schema %}
 {
@@ -49,7 +52,7 @@
       "id": "api_endpoint",
       "label": "API Endpoint URL",
       "default": "https://ketubah-text-generator.vercel.app",
-      "info": "Your Vercel deployment URL"
+      "info": "Your Vercel deployment URL (e.g., https://your-app.vercel.app)"
     }
   ],
   "presets": [
