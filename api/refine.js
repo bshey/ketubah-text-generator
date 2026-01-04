@@ -2,10 +2,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { buildRefinePrompt } from './_lib/prompts.js';
 
 const MODELS = [
-    'gemini-2.5-flash',
-    'gemini-2.5-flash-lite',
     'gemini-1.5-flash',
-    'gemini-1.5-pro'
+    'gemini-1.5-pro',
+    'gemini-pro'
 ];
 
 export default async function handler(req, res) {
