@@ -4,6 +4,7 @@ import { useGenerate } from './hooks/useGenerate'
 import { FormPanel } from './components/Form/FormPanel'
 import { PreviewPanel } from './components/Preview/PreviewPanel'
 import { EmailModal } from './components/Email/EmailModal'
+import { ConfirmationPage } from './components/Confirmation/ConfirmationPage'
 import { sendText } from './services/api'
 
 function App({ options = {} }) {
@@ -13,21 +14,44 @@ function App({ options = {} }) {
     } = useKetubanStore()
     const { generate, canGenerate } = useGenerate()
     const hasGenerated = !!englishText
-    const [emailSent, setEmailSent] = useState(false)
+
+    // Track if we're showing confirmation page
+    const [showConfirmation, setShowConfirmation] = useState(false)
+    const [submittedEmail, setSubmittedEmail] = useState('')
+    const [couponCode, setCouponCode] = useState('')
 
     const handleEmailSubmit = async (email) => {
         try {
-            await sendText({
+            const response = await sendText({
                 email,
                 english_text: englishText,
                 hebrew_text: hebrewText
             })
-            setEmailSent(true)
+
+            // Store email and coupon for confirmation page
+            setSubmittedEmail(email)
+            setCouponCode(response.data?.coupon_code || 'FREETEXT')
             setShowEmailModal(false)
-            // Could redirect to confirmation page here
+            setShowConfirmation(true)
         } catch (err) {
             throw err
         }
+    }
+
+    // Show confirmation page after email submission
+    if (showConfirmation) {
+        return (
+            <ConfirmationPage
+                email={submittedEmail}
+                englishText={englishText}
+                hebrewText={hebrewText}
+                couponCode={couponCode}
+                onStartOver={() => {
+                    setShowConfirmation(false)
+                    useKetubanStore.getState().reset()
+                }}
+            />
+        )
     }
 
     return (
@@ -44,19 +68,6 @@ function App({ options = {} }) {
                         className="error-dismiss"
                         onClick={() => setError(null)}
                         aria-label="Dismiss error"
-                    >
-                        ×
-                    </button>
-                </div>
-            )}
-
-            {emailSent && (
-                <div className="success-banner" role="status">
-                    ✅ Your Ketubah text has been sent! Check your email.
-                    <button
-                        className="success-dismiss"
-                        onClick={() => setEmailSent(false)}
-                        aria-label="Dismiss"
                     >
                         ×
                     </button>

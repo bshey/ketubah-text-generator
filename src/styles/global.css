@@ -579,3 +579,146 @@
     padding: 0;
     line-height: 1;
 }
+
+/* ===== CONFIRMATION PAGE STYLES ===== */
+
+.confirmation-page .header {
+    margin-bottom: var(--ketubah-space-lg);
+}
+
+.confirmation-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ketubah-space-xl);
+}
+
+/* Coupon Section */
+.coupon-section {
+    background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+    border: 2px solid var(--ketubah-accent);
+    border-radius: var(--ketubah-radius-lg);
+    padding: var(--ketubah-space-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--ketubah-space-lg);
+    box-shadow: 0 4px 6px rgba(184, 134, 11, 0.1);
+}
+
+.coupon-box {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ketubah-space-md);
+    text-align: left;
+}
+
+.coupon-icon {
+    font-size: 2.5rem;
+}
+
+.coupon-text h3 {
+    color: var(--ketubah-primary);
+    margin-bottom: var(--ketubah-space-xs);
+}
+
+.coupon-text p {
+    color: var(--ketubah-secondary);
+    margin-bottom: var(--ketubah-space-sm);
+}
+
+.coupon-code {
+    background: var(--ketubah-accent);
+    color: white;
+    padding: var(--ketubah-space-xs) var(--ketubah-space-md);
+    border-radius: var(--ketubah-radius-sm);
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+
+.btn-shop {
+    padding-left: var(--ketubah-space-xl);
+    padding-right: var(--ketubah-space-xl);
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+/* Copyable Text Sections */
+.text-sections {
+    display: grid;
+    gap: var(--ketubah-space-lg);
+}
+
+.copyable-section {
+    background: white;
+    border: 1px solid var(--ketubah-border);
+    border-radius: var(--ketubah-radius-md);
+    overflow: hidden;
+}
+
+.section-header {
+    padding: var(--ketubah-space-md);
+    background: #f7fafc;
+    border-bottom: 1px solid var(--ketubah-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-header h2 {
+    font-size: 1.1rem;
+    color: var(--ketubah-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.btn-copy {
+    padding: var(--ketubah-space-xs) var(--ketubah-space-sm);
+    font-size: 0.9rem;
+    background: white;
+}
+
+.copyable-text {
+    padding: var(--ketubah-space-lg);
+    line-height: 1.8;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.copyable-text p {
+    margin-bottom: var(--ketubah-space-md);
+}
+
+.copyable-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Confirmation Actions */
+.confirmation-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--ketubah-space-md);
+    margin-top: var(--ketubah-space-lg);
+}
+
+.confirmation-actions .btn {
+    text-decoration: none;
+}
+
+@media (max-width: 600px) {
+    .coupon-box {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .confirmation-actions {
+        flex-direction: column;
+    }
+}
