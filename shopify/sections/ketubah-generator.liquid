@@ -11,30 +11,35 @@
 {{ 'ketubah-widget.css' | asset_url | stylesheet_tag }}
 
 <style>
-  .ketubah-generator-wrapper {
+  /* Scoped section container - won't affect parent elements */
+  .ketubah-section {
+    all: initial;
+    display: block;
+    font-family: inherit;
+  }
+  
+  .ketubah-section .ketubah-generator-wrapper {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     min-height: 400px;
   }
   
-  /* Override any theme styles that might conflict */
-  .ketubah-generator-wrapper * {
-    box-sizing: border-box;
-  }
-  
   /* Loading state */
-  #ketubah-root:empty::before {
+  .ketubah-section #ketubah-root:empty::before {
     content: 'Loading Ketubah Generator...';
     display: block;
     text-align: center;
     padding: 40px;
     color: #666;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 </style>
 
-<div class="ketubah-generator-wrapper">
-  <div id="ketubah-root"></div>
+<div class="ketubah-section">
+  <div class="ketubah-generator-wrapper">
+    <div id="ketubah-root"></div>
+  </div>
 </div>
 
 <script>
